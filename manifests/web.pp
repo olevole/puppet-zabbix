@@ -308,17 +308,21 @@ class zabbix::web (
         'Ubuntu' : {
           if versioncmp($::operatingsystemmajrelease, '16.04') >= 0 {
             $php_db_package = "php-${db}"
+            $php_extra_package = "php-mbstring"
           }
           else {
             $php_db_package = "php5-${db}"
+            $php_extra_package = "php5-mbstring"
           }
         }
         'Debian' : {
           if versioncmp($::operatingsystemmajrelease, '9') >= 0 {
             $php_db_package = "php-${db}"
+            $php_extra_package = "php-mbstring"
           }
           else {
             $php_db_package = "php5-${db}"
+            $php_extra_package = "php5-mbstring"
           }
         }
         default : {
@@ -327,6 +331,13 @@ class zabbix::web (
       }
 
       package { $php_db_package:
+        ensure => $zabbix_package_state,
+        before => [
+          Package[$zabbix_web_package],
+          File['/etc/zabbix/web/zabbix.conf.php'],
+        ],
+      }
+      package { $php_extra_package:
         ensure => $zabbix_package_state,
         before => [
           Package[$zabbix_web_package],
